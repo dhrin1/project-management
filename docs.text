@@ -1,0 +1,25 @@
+composer require laravel/breeze --dev
+php artisan breeze:install --react
+
+
+add this User model //use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+
+php artisan make:controller ProjectController --model=Project --requests --resource
+
+php artisan make:controller TaskController --model=Task --requests --resource
+php artisan make:controller UserControlleer --model=User --requests --resource
+
+
+goto web.php 
+
+Route::redirect('/', 'dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function(){
+    Route::get('/dashboard', fn () =>  Inertia::render('Dashboard'))->name('dashboard');
+
+    Route::resource('project', ProjectController::class);
+    Route::resource('task', TaskController::class);
+    Route::resource('user', UserControlleer::class);
+});
+
