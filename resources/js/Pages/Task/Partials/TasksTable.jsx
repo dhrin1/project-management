@@ -27,29 +27,65 @@ export default function TasksTable(props) {
         searhFieldChanged(field, e.target.value);
     };
 
+    const deleteTask = (task) => {
+        router.delete(route("task.destroy", task.id), {
+            onBefore: () =>
+                confirm("Are you sure you want to delete this task?"),
+            preserveScroll: true,
+        });
+    };
+
     return (
         <div className="w-full p-2">
             <table className="table-auto w-full table-condensed text-sm">
                 <thead>
                     <tr className="border-tb ">
-                        <TableHeading name="name" isSortable={query}>
+                        <TableHeading
+                            name="project"
+                            table="task"
+                            isSortable={query}
+                        >
+                            Project Name
+                        </TableHeading>
+                        <TableHeading
+                            name="name"
+                            table="task"
+                            isSortable={query}
+                        >
                             Name
                         </TableHeading>
-                        <TableHeading name="status" isSortable={query}>
+                        <TableHeading
+                            name="status"
+                            table="task"
+                            isSortable={query}
+                        >
                             Status
                         </TableHeading>
-                        <TableHeading name="created_at" isSortable={query}>
+                        <TableHeading
+                            name="created_at"
+                            table="task"
+                            isSortable={query}
+                        >
                             Created Date
                         </TableHeading>
-                        <TableHeading name="due_date" isSortable={query}>
+                        <TableHeading
+                            name="due_date"
+                            table="task"
+                            isSortable={query}
+                        >
                             Due Date
                         </TableHeading>
-                        <TableHeading name="due_date" isSortable={query}>
+                        <TableHeading
+                            name="due_date"
+                            table="task"
+                            isSortable={query}
+                        >
                             Created By
                         </TableHeading>
                         <TableHeading name="actions">Actions</TableHeading>
                     </tr>
                     <tr className="py-2">
+                        <th className="text-center px-2"></th>
                         <th className="text-start px-2">
                             <TextInput
                                 placeholder="Tasks Name"
@@ -85,12 +121,20 @@ export default function TasksTable(props) {
                             key={idx + task.id}
                             className="hover:bg-gray-100 transition-colors duration-100 border-b"
                         >
+                            <td className="text-start p-2  ">
+                                {task.project.name}
+                            </td>
                             <td className="text-start p-2 flex items-center ">
                                 <img
                                     src={task.image_path}
                                     className="w-16 h-9 mr-2"
                                 />
-                                {task.name}
+                                <Link
+                                    href={route("task.show", task.id)}
+                                    className="hover:underline hover:text-blue-700"
+                                >
+                                    {task.name}
+                                </Link>
                             </td>
                             <td className={`text-start p-2 `}>
                                 <span
@@ -112,15 +156,29 @@ export default function TasksTable(props) {
                             </td>
                             <td className="h-13">
                                 <div className="inline-flex space-x-2 h-full items-center">
-                                    <Link className=" py-1 text-green-500 text-sm hover:text-green-600">
+                                    <Link
+                                        href={route("task.edit", task.id)}
+                                        className=" py-1 text-green-500 text-sm hover:text-green-600"
+                                    >
                                         Edit
                                     </Link>
                                     <button
                                         type="button"
+                                        onClick={() => deleteTask(task)}
                                         className=" py-1 text-red-500 text-sm   hover:text-red-600"
                                     >
                                         Remove
                                     </button>
+                                    {/* <Link
+                                        preserveScroll
+                                        onClick={() =>
+                                            router.delete(
+                                                route("task.destroy", task.id)
+                                            )
+                                        }
+                                    >
+                                        Remove
+                                    </Link> */}
                                 </div>
                             </td>
                         </tr>

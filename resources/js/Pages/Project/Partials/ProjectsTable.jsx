@@ -27,24 +27,60 @@ export default function ProjectsTable(props) {
         searhFieldChanged(field, e.target.value);
     };
 
+    const deleteProject = (project) => {
+        router.delete(route("project.destroy", project.id), {
+            preserveScroll: true,
+        });
+    };
+
+    const onChangeStatus = (project, e) => {
+        router.put(
+            `project/${project.id}`,
+            {
+                status: e.target.value,
+            },
+            { preserveScroll: true }
+        );
+    };
+
     return (
         <div className="w-full p-2">
             <table className="table-auto w-full table-condensed text-sm">
                 <thead>
                     <tr className="border-tb ">
-                        <TableHeading name="name" isSortable={query}>
+                        <TableHeading
+                            name="name"
+                            table="project"
+                            isSortable={query}
+                        >
                             Name
                         </TableHeading>
-                        <TableHeading name="status" isSortable={query}>
+                        <TableHeading
+                            name="status"
+                            table="project"
+                            isSortable={query}
+                        >
                             Status
                         </TableHeading>
-                        <TableHeading name="created_at" isSortable={query}>
+                        <TableHeading
+                            name="created_at"
+                            table="project"
+                            isSortable={query}
+                        >
                             Created Date
                         </TableHeading>
-                        <TableHeading name="due_date" isSortable={query}>
+                        <TableHeading
+                            name="due_date"
+                            table="project"
+                            isSortable={query}
+                        >
                             Due Date
                         </TableHeading>
-                        <TableHeading name="due_date" isSortable={query}>
+                        <TableHeading
+                            name="due_date"
+                            table="project"
+                            isSortable={query}
+                        >
                             Created By
                         </TableHeading>
                         <TableHeading name="actions">Actions</TableHeading>
@@ -90,16 +126,31 @@ export default function ProjectsTable(props) {
                                     src={project.image_path}
                                     className="w-16 h-9 mr-2"
                                 />
-                                {project.name}
+                                <Link
+                                    href={route("project.show", project.id)}
+                                    className="hover:text-blue-500 hover:underline"
+                                >
+                                    {project.name}
+                                </Link>
                             </td>
                             <td className={`text-start p-2 `}>
-                                <span
+                                <select
                                     className={`text-start px-2 py-1 rounded-md text-white text-sm font-medium ${
                                         PROJECT_STATUS_CLASS_MAP[project.status]
                                     }`}
+                                    onChange={(e) => onChangeStatus(project, e)}
+                                    defaultValue={project.status}
                                 >
-                                    {PROJECT_STATUS_TEXT_MAP[project.status]}
-                                </span>
+                                    {[
+                                        "pending",
+                                        "in_progress",
+                                        "completed",
+                                    ].map((status, idx) => (
+                                        <option key={idx} value={status}>
+                                            {PROJECT_STATUS_TEXT_MAP[status]}
+                                        </option>
+                                    ))}
+                                </select>
                             </td>
                             <td className="text-center text-nowrap p-2">
                                 {project.created_at}
@@ -112,11 +163,15 @@ export default function ProjectsTable(props) {
                             </td>
                             <td className="h-13">
                                 <div className="inline-flex space-x-2 h-full items-center">
-                                    <Link className=" py-1 text-green-500 text-sm hover:text-green-600">
+                                    <Link
+                                        href={route("project.edit", project.id)}
+                                        className=" py-1 text-green-500 text-sm hover:text-green-600"
+                                    >
                                         Edit
                                     </Link>
                                     <button
                                         type="button"
+                                        onClick={() => deleteProject(project)}
                                         className=" py-1 text-red-500 text-sm   hover:text-red-600"
                                     >
                                         Remove

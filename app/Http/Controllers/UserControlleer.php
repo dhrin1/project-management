@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 
 class UserControlleer extends Controller
@@ -13,7 +14,23 @@ class UserControlleer extends Controller
      */
     public function index()
     {
-        //
+        $query  = User::query();
+
+        $sortField = request("sort_field", "created_at");
+        $sortDirection = request("sort_direction", "desc");
+
+
+        if(request('name')){
+            $query->where("name", "like", "%".request("name")."%");
+        }
+      
+        $users = $query->orderBy($sortField, $sortDirection)->paginate(10)->onEachSide(1);
+        return inertia("User/Index", [
+            "users" =>  UserResource::collection($users),
+            "queryParams" => request()->query() ?: null,
+            'success' => session('success'),
+            'error' => session('error'),
+        ]);
     }
 
     /**
@@ -21,7 +38,9 @@ class UserControlleer extends Controller
      */
     public function create()
     {
-        //
+        return inertia("User/Create", [
+            'success' => session('success')
+        ]);
     }
 
     /**
@@ -29,7 +48,12 @@ class UserControlleer extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        //
+        $data = $request->validated();
+        $data["password"] = bcrypt($data["password"]);
+        $data["email_verified_at"] = time();
+        User::create($data);
+
+        return to_route("user.index")->with("success", "New account created");
     }
 
     /**
@@ -45,7 +69,9 @@ class UserControlleer extends Controller
      */
     public function edit(User $user)
     {
-        //
+        return inertia("User/Edit", [
+            "user" => new UserResource($user)
+        ]);
     }
 
     /**
@@ -53,7 +79,15 @@ class UserControlleer extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $data = $request->validated();
+        $password = $data['password'] ?? null;
+        if($password) {
+            $data['password'] = bcrypt($password);
+        }else{
+            unset($data['password']);
+        }
+        $user->update($data);
+        return to_route('user.index')->with('success', "User ".$user->name." was updated");
     }
 
     /**
@@ -61,6 +95,8 @@ class UserControlleer extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        if($user->id === auth()->user()->id) return to_route("user.index")->with( "error", "Can't delete the authenticated account!");
+        $user->delete();
+        return to_route("user.index")->with("success", "User ".$user->name." was deleted.");
     }
 }

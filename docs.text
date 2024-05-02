@@ -4,6 +4,9 @@ php artisan breeze:install --react
 
 add this User model //use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+add  model, factory and migraation
+
+php artisan make:model Project -fm
 
 php artisan make:controller ProjectController --model=Project --requests --resource
 

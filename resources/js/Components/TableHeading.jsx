@@ -2,7 +2,7 @@ import { router } from "@inertiajs/react";
 import { ChevronUpIcon, ChevronDownIcon } from "lucide-react";
 import React from "react";
 
-export default function TableHeading({ name, isSortable, children }) {
+export default function TableHeading({ name, isSortable, table, children }) {
     const query = isSortable;
     const sortChanged = (field) => {
         if (typeof query === "undefined") return;
@@ -16,7 +16,7 @@ export default function TableHeading({ name, isSortable, children }) {
             query.sort_field = field;
             query.sort_direction = "asc";
         }
-        router.get(route("project.index"), query);
+        router.get(route(`${table}.index`), query);
     };
     return (
         <th onClick={() => sortChanged(name)} className="text-start">
